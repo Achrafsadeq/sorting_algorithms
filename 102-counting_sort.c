@@ -3,61 +3,71 @@
 
 /**
  * arr_max - Finds the maximum value in an array
- * @array: Pointer to the array
- * @size: Total number of elements in the array
- *
+ * @array: Pointer to the array of integers
+ * @size: Number of elements in the array
  * Return: The maximum integer value in the array
  */
 int arr_max(int *array, size_t size)
 {
-	int max = array[0];
+	int max;
 	size_t i;
 
+	max = array[0];
 	for (i = 1; i < size; i++)
-	{
 		if (array[i] > max)
 			max = array[i];
-	}
 	return (max);
 }
 
 /**
- * counting_sort - Sorts an array using the Counting Sort algorithm
- * @array: Pointer to the array to be sorted
+ * counting_sort - Sorts an array using the Counting sort algorithm
+ * @array: Pointer to the array of integers to sort
  * @size: Number of elements in the array
+ *
+ * This function sorts an array by counting occurrences of each value,
+ * calculating cumulative counts, and using them to place each value
+ * in its correct position in the sorted output.
  */
 void counting_sort(int *array, size_t size)
 {
-	int *count_arr, *sorted_arr, max_value, num;
+	int *arr, *o_arr, max, num;
 	size_t i;
 
 	if (size < 2 || !array)
 		return;
 
-	max_value = arr_max(array, size);
-	count_arr = malloc(sizeof(int) * (max_value + 1));
-	sorted_arr = malloc(sizeof(int) * size);
+	max = arr_max(array, size);
+	/* Allocate memory for counting array and output array */
+	arr = malloc(sizeof(size_t) * (max + 1));
+	o_arr = malloc(sizeof(int) * size);
 
-	for (i = 0; (int)i <= max_value; i++)
-		count_arr[i] = 0;
+	/* Initialize counting array to zero */
+	for (i = 0; (int)i <= max; i++)
+		arr[i] = 0;
 
-	for (i = 0; i < size; i++)
-		count_arr[array[i]] += 1;
-
-	for (i = 1; (int)i <= max_value; i++)
-		count_arr[i] += count_arr[i - 1];
-
-	print_array(count_arr, max_value + 1);
-
+	/* Count occurrences of each value */
 	for (i = 0; i < size; i++)
 	{
-		sorted_arr[count_arr[array[i]] - 1] = array[i];
-		count_arr[array[i]]--;
+		num = array[i];
+		arr[num] += 1;
 	}
+	/* Calculate cumulative counts */
+	for (i = 1; (int)i <= max; i++)
+		arr[i] += arr[i - 1];
 
+	/* Print the counting array for debugging */
+	print_array(arr, max + 1);
+
+	/* Place each element in the sorted output array based on count */
 	for (i = 0; i < size; i++)
-		array[i] = sorted_arr[i];
-
-	free(sorted_arr);
-	free(count_arr);
+	{
+		o_arr[arr[array[i]] - 1] = array[i];
+		arr[array[i]]--;
+	}
+	/* Copy sorted elements back to the original array */
+	for (i = 0; i < size; i++)
+		array[i] = o_arr[i];
+	/* Free allocated memory */
+	free(o_arr);
+	free(arr);
 }
